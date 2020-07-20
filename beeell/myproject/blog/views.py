@@ -4,6 +4,9 @@ from .models import Blog
 from django.utils import timezone
 
 from .forms import BlogUpdate
+from django.core.paginator import Paginator
+
+from faker import Faker
 
 def delete(request, blog_id):
     Blog.objects.get(id=blog_id).delete()
@@ -29,7 +32,20 @@ def detail(request, blog_id):
 
 def blog(request):
     blogs = Blog.objects
-    return render(request, 'blog.html', {'blogs': blogs})
+
+    #blog를 쿼리셋으로 가져옴
+    blog_list = Blog.objects.all()
+
+    #그걸 몇개씩 잘라서 페이지를 만들어줘
+    paginator = Paginator(blog_list,10)
+
+    #실제로 페이지에 들어가는 내용을 가져와줘
+    page = request.GET.get('page')
+
+    #그걸 뿌릴 수 있게 바꿔저
+    articles = paginator.get_page(page)
+
+    return render(request, 'blog.html', {'blogs': blogs,'articles':articles})
 
 def new(request):
     return render(request, 'new.html')
@@ -49,3 +65,13 @@ def update(request, blog_id):
         form = BlogUpdate(instance = blog)
  
         return render(request,'update.html', {'form':form})
+
+def fake(request):
+    for i in range(10):
+      blog = Blog()
+      fake = Faker()
+      blog.title = fake.name()
+      blog.body = fake.sentence()
+      blog.pub_date = timezone.datetime.now()
+      blog.save()
+    return redirect('/')

@@ -1,4 +1,7 @@
-<div class="container">
+{% extends 'base.html' %}
+{% block content %}
+
+ <div class="container">
     <form action="{% url 'create' %}">
       <h4>제목: </h4>
       <input type="text" name="title">
@@ -11,3 +14,5 @@
       <input class="btn btn-dark" type="submit" value="제출하기">
    </form>
  </div>
+
+{% endblock %}
